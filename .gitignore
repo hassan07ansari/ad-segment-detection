@@ -1,0 +1,27 @@
+# Virtual environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Generated/downloaded media
+data/videos/
+data/audios/
+data/frames/
+
+# Video/audio files
+*.mp4
+*.mkv
+*.webm
+*.wav
+*.mp3
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+
+# Environment/secrets
+.env

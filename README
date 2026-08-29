@@ -1,0 +1,579 @@
+# Ad Segment Detection in Video
+
+AI Engineer take-home project for detecting advertisement segments inside videos.
+
+The system accepts a video URL, processes audio and visual evidence, and returns advertisement segments in machine-readable JSON.
+
+The pipeline is designed for:
+
+* long-form YouTube videos
+* YouTube Shorts
+* Instagram Reels through local/direct media input
+* live-stream processing as a design extension
+
+---
+
+# 1. Current Status
+
+The main pipeline components are implemented:
+
+* YouTube acquisition using `yt-dlp`
+* audio extraction using FFmpeg
+* timestamped transcription using `faster-whisper`
+* rule-based and LLM-based audio ad detection
+* frame sampling
+* OpenCV candidate-frame filtering
+* local vision-language-model classification
+* audio/visual fusion
+* FastAPI HTTP endpoint
+* manual `ground_truth.json`
+* `DESIGN.md`
+* `EVAL.md`
+
+The main current limitation is local VLM inference speed.
+
+`qwen3-vl:4b` is running locally through Ollama on CPU. Individual image classifications can take several minutes on my machine.
+
+Because of this, I tested the visual model on real selected candidate frames but did not complete a full end-to-end visual pass over every candidate for all five supplied videos.
+
+A faster CPU or GPU-backed Ollama environment should reduce this inference bottleneck, but the current submission should be treated as partially validated rather than a fully benchmarked production pipeline.
+
+---
+
+# 2. Project Structure
+
+```text
+project/
+│
+├── app/
+│   ├── acquisition.py
+│   ├── audio.py
+│   ├── transcription.py
+│   ├── detector.py
+│   ├── frames.py
+│   ├── visual_detector.py
+│   ├── fusion.py
+│   ├── main.py
+│   └── api.py
+│
+├── data/
+│   ├── videos/
+│   ├── audios/
+│   └── frames/
+│
+├── notes/
+│
+├── ground_truth.json
+├── DESIGN.md
+├── EVAL.md
+├── README.md
+├── requirements.txt
+└── .gitignore
+```
+
+---
+
+# 3. Pipeline
+
+```text
+Video URL
+   |
+   v
+yt-dlp acquisition
+   |
+   +---------------------------+
+   |                           |
+   v                           v
+Audio Pipeline             Visual Pipeline
+   |                           |
+FFmpeg                     Frame sampling
+   |                           |
+faster-whisper             OpenCV filtering
+   |                           |
+Rules + Qwen text model    Qwen VLM
+   |                           |
+   +-------------+-------------+
+                 |
+                 v
+             Fusion
+                 |
+                 v
+           Final JSON
+```
+
+For long-form videos, audio is treated as the stronger signal.
+
+For Shorts and Reels, visual evidence is given more importance because promotional information can appear on screen even when the spoken content is informational.
+
+---
+
+# 4. Requirements
+
+The project requires:
+
+* Python
+* FFmpeg
+* Ollama
+* Python dependencies from `requirements.txt`
+
+The local models used are:
+
+```text
+qwen3:4b-instruct
+qwen3-vl:4b
+```
+
+The transcription model is:
+
+```text
+faster-whisper
+Whisper small
+```
+
+No paid hosted AI API is required.
+
+---
+
+# 5. Python Setup
+
+From the project root:
+
+```bash
+python -m venv .venv
+```
+
+### Windows
+
+```bash
+.venv\Scripts\activate
+```
+
+### macOS / Linux
+
+```bash
+source .venv/bin/activate
+```
+
+Install the Python dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+---
+
+# 6. FFmpeg
+
+FFmpeg must be installed and available from the command line.
+
+Verify it with:
+
+```bash
+ffmpeg -version
+```
+
+The pipeline uses FFmpeg to convert downloaded video audio into mono 16 kHz WAV audio for transcription.
+
+If this command is not recognized, install FFmpeg and add it to the system PATH before running the pipeline.
+
+---
+
+# 7. Ollama Setup
+
+Install and start Ollama.
+
+Verify that Ollama is available:
+
+```bash
+ollama --version
+```
+
+Pull the text model:
+
+```bash
+ollama pull qwen3:4b-instruct
+```
+
+Pull the vision-language model:
+
+```bash
+ollama pull qwen3-vl:4b
+```
+
+Verify the installed models:
+
+```bash
+ollama list
+```
+
+You should see both:
+
+```text
+qwen3:4b-instruct
+qwen3-vl:4b
+```
+
+If Ollama is not already running as a background service, start it with:
+
+```bash
+ollama serve
+```
+
+---
+
+# 8. Run the API
+
+The current code is run from inside the `app` directory.
+
+From the project root:
+
+```bash
+cd app
+```
+
+Then start FastAPI using Uvicorn:
+
+```bash
+python -m uvicorn api:app
+```
+
+The server should start at:
+
+```text
+http://127.0.0.1:8000
+```
+
+Opening:
+
+```text
+http://127.0.0.1:8000/
+```
+
+should return:
+
+```json
+{
+  "message": "Ad Segment Detection API"
+}
+```
+
+---
+
+# 9. Swagger API
+
+FastAPI automatically provides an interactive API page.
+
+Open:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+The API currently exposes:
+
+```text
+GET /
+POST /detect
+```
+
+For `POST /detect`, use a request such as:
+
+```json
+{
+  "url": "https://www.youtube.com/shorts/Ve0zdhTQA4U"
+}
+```
+
+The endpoint calls the main processing pipeline and returns the detected advertisement segments.
+
+---
+
+# 10. Example Command
+
+With the server running, the endpoint can also be called using `curl`.
+
+```bash
+curl -X POST "http://127.0.0.1:8000/detect" \
+-H "Content-Type: application/json" \
+-d "{\"url\":\"https://www.youtube.com/shorts/Ve0zdhTQA4U\"}"
+```
+
+Using `/docs` is recommended if shell quoting differs on the reviewer's operating system.
+
+---
+
+# 11. Expected Output Shape
+
+The API returns the assignment JSON structure.
+
+Example:
+
+```json
+{
+  "source": {
+    "url": "https://...",
+    "platform": "youtube",
+    "kind": "short",
+    "duration_s": 63.88,
+    "processed_at": "..."
+  },
+  "segments": [
+    {
+      "id": "seg_01",
+      "start_s": 4.0,
+      "end_s": 63.8,
+      "ad_type": "other",
+      "confidence": 0.9,
+      "brand": "Example Brand",
+      "description": "Description of the detected promotion.",
+      "evidence": {
+        "frame_timestamps": [],
+        "transcript_span": "",
+        "signals_used": []
+      }
+    }
+  ],
+  "stats": {
+    "wall_clock_s": 0.0,
+    "estimated_cost_usd": 0.0,
+    "frames_sampled": 0,
+    "model_calls": 0
+  }
+}
+```
+
+The exact values depend on the input video and model results.
+
+---
+
+# 12. Test Inputs
+
+The supplied assignment test set is:
+
+### Long-form YouTube
+
+```text
+https://www.youtube.com/watch?v=ujFWRFYLGjY
+```
+
+### YouTube Short
+
+```text
+https://www.youtube.com/shorts/Ve0zdhTQA4U
+```
+
+### Live stream
+
+```text
+https://www.youtube.com/watch?v=s0LLVQeMmtU
+```
+
+### Instagram Reel 1
+
+```text
+https://www.instagram.com/reel/DJl6-v8oufg
+```
+
+### Instagram Reel 2
+
+```text
+https://www.instagram.com/reel/Db78RoIuOyl/
+```
+
+---
+
+# 13. Instagram Reels
+
+Automated Instagram acquisition is intentionally not implemented.
+
+The detection pipeline is designed to work from a local Reel file or direct media file.
+
+For the supplied Instagram test inputs, media can be acquired manually and passed through the local-file path.
+
+This keeps Instagram authentication and scraping concerns separate from the actual advertisement-detection problem.
+
+See `DESIGN.md` for the production acquisition approach.
+
+---
+
+# 14. Ground Truth
+
+I manually reviewed the five supplied test inputs.
+
+The labels are stored in:
+
+```text
+ground_truth.json
+```
+
+The ground truth records:
+
+* advertisement boundaries
+* ad type
+* brand
+* description
+* evidence
+* ambiguous cases and manual decisions
+
+For the live stream, I manually observed approximately a 30-minute window because the source has no fixed ending.
+
+---
+
+# 15. Evaluation
+
+See:
+
+```text
+EVAL.md
+```
+
+The evaluation explains:
+
+* how I created the ground truth
+* precision
+* recall
+* F1
+* segment IoU
+* boundary error
+* current evaluation status
+* real failure cases
+* latency
+* limitations
+
+I do not report final precision, recall, F1 or IoU numbers because I did not complete full final predictions for all five test videos.
+
+I report the actual experiments and failure cases instead of inventing evaluation results.
+
+---
+
+# 16. Design
+
+See:
+
+```text
+DESIGN.md
+```
+
+It contains:
+
+* definition of an advertisement
+* ad taxonomy
+* architecture
+* audio and visual signal choices
+* sampling approach
+* all ambiguity rulings
+* live-stream design
+* failed approaches
+* cost and latency
+* scaling considerations
+* future improvements
+* AI-assistance disclosure
+
+---
+
+# 17. Known Limitation: Visual Model Latency
+
+The largest current limitation is the local vision-language model.
+
+For the supplied YouTube Short:
+
+```text
+Video duration:       approximately 63.88 s
+Original frames:      1597
+Sampled frames:       128
+Candidate frames:     14
+```
+
+Sampling occurs every 0.5 seconds.
+
+OpenCV filtering reduces the 128 sampled frames to 14 candidate frames before calling the VLM.
+
+This significantly reduces unnecessary model calls.
+
+However, `qwen3-vl:4b` is still slow on my local CPU.
+
+A single candidate image can take several minutes to process.
+
+I also tested sending all 14 candidate images in one request, but the request exceeded the model context limit.
+
+Possible production improvements include:
+
+* GPU inference
+* smaller/faster VLM
+* better candidate ranking
+* lower-resolution inputs
+* controlled image batching
+* asynchronous workers
+
+---
+
+# 18. Reproducing the Tested Visual Example
+
+The visual stage was verified using a real candidate frame from the supplied YouTube Short.
+
+One known candidate was:
+
+```text
+frame_10.0.jpg
+```
+
+This frame contains the Avis Vascular Center promotional panel.
+
+The same `classify_frame()` function used by the normal pipeline correctly identified the advertisement and returned visual evidence such as:
+
+* Avis Vascular Center
+* ₹4500
+* phone number
+* promotional Telugu text
+
+The full candidate loop calls this same function for each selected candidate.
+
+Because local CPU inference is slow, completing every candidate can require significant processing time.
+
+---
+
+# 19. Cost
+
+The project currently uses local models rather than hosted model APIs.
+
+Therefore:
+
+```text
+estimated hosted API cost = $0
+```
+
+This excludes:
+
+* local electricity
+* hardware cost
+* CPU/GPU compute time
+
+The current implementation trades hosted API cost for local inference latency.
+
+---
+
+# 20. Clean Run Note
+
+The individual pipeline stages and API were tested during development.
+
+However, because of the local VLM latency, I did not complete a final clean-checkout, full five-video end-to-end evaluation before submission.
+
+A reviewer running the project on faster inference hardware should expect the vision stage to be more practical, but this submission does not claim that the entire five-video pipeline has already been fully validated on another environment.
+
+---
+
+# 21. Documents
+
+```text
+README.md
+    Setup and run instructions
+
+DESIGN.md
+    Architecture, decisions and trade-offs
+
+EVAL.md
+    Evaluation methodology, tests and failures
+
+ground_truth.json
+    Manual labels for the supplied test set
+```

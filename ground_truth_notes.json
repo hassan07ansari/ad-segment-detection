@@ -1,0 +1,239 @@
+[
+  {
+    "source": {
+      "url": "https://www.youtube.com/watch?v=ujFWRFYLGjY",
+      "platform": "youtube",
+      "kind": "vod",
+      "duration_s": 2806.0,
+      "processed_at": "2026-08-29T15:50:00Z"
+    },
+    "content_description": "The main video is a long-form medical discussion/interview.",
+    "segments": [
+      {
+        "id": "seg_01",
+        "start_s": 0.0,
+        "end_s": 9.0,
+        "ad_type": "preroll",
+        "confidence": 1.0,
+        "brand": "Vista Imaging Diagnostics",
+        "description": "I labelled this as a preroll advertisement because the video begins with a promotional visual for Vista Imaging Diagnostics before the main discussion starts. The visual shows a person lying in a medical scanner, along with Vista Imaging Banjara Hills, 640 Slice CT Scan and the phone number 7416902233.",
+        "evidence": {
+          "frame_timestamps": [],
+          "transcript_span": "",
+          "signals_used": [
+            "manual_visual_review",
+            "brand_name",
+            "medical_service_details",
+            "phone_number"
+          ]
+        }
+      }
+    ],
+    "manual_notes": [
+      "Around 8 seconds, I saw a full-screen iDream Media logo. I did not label this as a separate advertisement because I could not confirm that it was promotional rather than producer or channel branding.",
+      "From approximately 5 minutes 44 seconds, a small iDream logo and faded iDream Media branding remained visible until the end of the video. I did not label this as an advertisement because it behaved like persistent channel branding and did not contain a clear commercial offer or request to the viewer."
+    ],
+    "stats": {
+      "wall_clock_s": 0.0,
+      "estimated_cost_usd": 0.0,
+      "frames_sampled": 0,
+      "model_calls": 0
+    },
+    "stats_note": "This is manually labelled ground truth, so pipeline execution statistics are not applicable."
+  },
+
+  {
+    "source": {
+      "url": "https://www.youtube.com/shorts/Ve0zdhTQA4U",
+      "platform": "youtube",
+      "kind": "short",
+      "duration_s": 63.8,
+      "processed_at": "2026-08-29T15:50:00Z"
+    },
+    "content_description": "A lady or doctor explains the health benefits of a leaf. The iDream Mana Health logo is visible as channel branding.",
+    "segments": [
+      {
+        "id": "seg_01",
+        "start_s": 4.0,
+        "end_s": 63.8,
+        "ad_type": "other",
+        "confidence": 1.0,
+        "brand": "Avis Vascular Center",
+        "description": "I labelled this as an advertisement because from approximately 4 seconds onward, a promotional panel covers roughly half of the screen and remains until the video ends. It displays Avis Vascular Center, an amount of 4500, the phone number 8929721641 and other promotional information.",
+        "evidence": {
+          "frame_timestamps": [],
+          "transcript_span": "",
+          "signals_used": [
+            "manual_visual_review",
+            "brand_name",
+            "price",
+            "phone_number",
+            "promotional_panel"
+          ]
+        }
+      }
+    ],
+    "manual_notes": [
+      "I did not label the iDream Mana Health logo by itself as an advertisement because it appears to be normal channel branding.",
+      "I did not label the lady's discussion about the benefits of the leaf as advertising. I treated that speech as the main informational content of the video.",
+      "The visual advertisement remains present until the final frame, so I used the full video duration as the end boundary."
+    ],
+    "stats": {
+      "wall_clock_s": 0.0,
+      "estimated_cost_usd": 0.0,
+      "frames_sampled": 0,
+      "model_calls": 0
+    },
+    "stats_note": "This is manually labelled ground truth, so pipeline execution statistics are not applicable."
+  },
+
+  {
+    "source": {
+      "url": "https://www.youtube.com/watch?v=s0LLVQeMmtU",
+      "platform": "youtube",
+      "kind": "live",
+      "duration_s": 1800.0,
+      "processed_at": "2026-08-29T15:50:00Z",
+      "observation_window_s": 1800.0
+    },
+    "content_description": "I manually observed approximately 30 minutes of the Asia Net News live stream. Four panelists were discussing a topic in Telugu. Because the source was live and had no fixed ending, the timestamps in this ground truth refer only to the approximately 30-minute window that I observed.",
+    "segments": [
+      {
+        "id": "seg_01",
+        "start_s": 0.0,
+        "end_s": 1800.0,
+        "ad_type": "other",
+        "confidence": 1.0,
+        "brand": "Schneider Electric",
+        "description": "I labelled the persistent Schneider Electric branding as advertising because it remained visible as part of the broadcast layout throughout the approximately 30-minute observation window.",
+        "evidence": {
+          "frame_timestamps": [],
+          "transcript_span": "",
+          "signals_used": [
+            "manual_visual_review",
+            "persistent_branding",
+            "broadcast_overlay"
+          ]
+        }
+      },
+      {
+        "id": "seg_02",
+        "start_s": 0.0,
+        "end_s": 1800.0,
+        "ad_type": "self_promo",
+        "confidence": 1.0,
+        "brand": "Asia Net News",
+        "description": "I labelled the persistent Subscribe Now element as self-promotion because it was physically embedded inside the news broadcast frame and appeared to promote the Asia Net News channel itself.",
+        "evidence": {
+          "frame_timestamps": [],
+          "transcript_span": "",
+          "signals_used": [
+            "manual_visual_review",
+            "subscribe_call_to_action",
+            "channel_promotion"
+          ]
+        }
+      }
+    ],
+    "manual_notes": [
+      "I also observed Edimannickal Golden Diamonds branding inside one particular panelist's feed. It remained visible while that panelist feed was present and disappeared when the panelist feed disappeared. I consider it promotional advertising, but I did not record the exact start and end timestamps, so I am not inventing a segment boundary.",
+      "I observed additional changing advertisements appearing in different parts of the broadcast layout. I initially tried to find a fixed timing pattern, but the intervals were not consistent. Because I did not record exact start and end timestamps for these advertisements, I am not inventing boundaries for them.",
+      "A Groww advertisement was served to me by YouTube while I was watching the live stream. I did not include it in the ground-truth segments because it appeared to be a platform-served advertisement from my YouTube playback session rather than part of the underlying live broadcast media."
+    ],
+    "stats": {
+      "wall_clock_s": 0.0,
+      "estimated_cost_usd": 0.0,
+      "frames_sampled": 0,
+      "model_calls": 0
+    },
+    "stats_note": "This is manually labelled ground truth. The live source has no fixed duration, so I used the approximately 30-minute observation window for manual evaluation."
+  },
+
+  {
+    "source": {
+      "url": "https://www.instagram.com/reel/DJl6-v8oufg",
+      "platform": "instagram",
+      "kind": "short",
+      "duration_s": 13.38,
+      "processed_at": "2026-08-29T15:50:00Z"
+    },
+    "content_description": "The Reel is posted by Asian Dental Official. A lady dentist explains or demonstrates how much toothpaste should be used while brushing.",
+    "segments": [
+      {
+        "id": "seg_01",
+        "start_s": 9.3,
+        "end_s": 13.38,
+        "ad_type": "self_promo",
+        "confidence": 1.0,
+        "brand": "Asian Dental Official",
+        "description": "I labelled this as self-promotion from approximately 9.3 seconds because a Follow us for more dental tips message appears and is followed by a full-screen promotional end card. From approximately 10.71 seconds, the end card displays the clinic information and its Jubilee Hills, Hyderabad address.",
+        "evidence": {
+          "frame_timestamps": [],
+          "transcript_span": "",
+          "signals_used": [
+            "manual_visual_review",
+            "follow_call_to_action",
+            "clinic_address",
+            "promotional_end_card"
+          ]
+        }
+      }
+    ],
+    "manual_notes": [
+      "I treated the earlier toothpaste demonstration as the main informational content.",
+      "I started the self-promotion segment at 9.3 seconds because the Follow us message is already a direct promotion of the same dental page.",
+      "I intentionally did not include the phone number in this ground truth because I was not fully confident that I had copied it correctly."
+    ],
+    "stats": {
+      "wall_clock_s": 0.0,
+      "estimated_cost_usd": 0.0,
+      "frames_sampled": 0,
+      "model_calls": 0
+    },
+    "stats_note": "This is manually labelled ground truth, so pipeline execution statistics are not applicable."
+  },
+
+  {
+    "source": {
+      "url": "https://www.instagram.com/reel/Db78RoIuOyl/",
+      "platform": "instagram",
+      "kind": "short",
+      "duration_s": 23.0,
+      "processed_at": "2026-08-29T15:50:00Z"
+    },
+    "content_description": "The Reel is posted by Clinique K Dental. A doctor and patient discuss a dental cap and its cost. Prices also appear in the subtitles during the conversation.",
+    "segments": [
+      {
+        "id": "seg_01",
+        "start_s": 20.0,
+        "end_s": 23.0,
+        "ad_type": "self_promo",
+        "confidence": 1.0,
+        "brand": "Clinique K Dental",
+        "description": "I labelled the final part as self-promotion because at approximately 20 seconds the Reel changes to a full-screen clinic promotion showing Clinique K Dental, Kavuri Hills, Madhapur, Hyderabad 500033 and the phone numbers 8374623067 and 8328269920.",
+        "evidence": {
+          "frame_timestamps": [],
+          "transcript_span": "",
+          "signals_used": [
+            "manual_visual_review",
+            "clinic_name",
+            "clinic_address",
+            "phone_numbers",
+            "promotional_end_card"
+          ]
+        }
+      }
+    ],
+    "manual_notes": [
+      "The earlier part of the Reel contains a doctor and patient discussing a dental cap and its price. Although the content could also have promotional value because it is posted by the clinic, I did not create a separate ad segment for that discussion.",
+      "I used approximately 20 seconds as the ad boundary because that is where the clear full-screen clinic promotional card begins."
+    ],
+    "stats": {
+      "wall_clock_s": 0.0,
+      "estimated_cost_usd": 0.0,
+      "frames_sampled": 0,
+      "model_calls": 0
+    },
+    "stats_note": "This is manually labelled ground truth, so pipeline execution statistics are not applicable."
+  }
+]
