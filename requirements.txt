@@ -3,3 +3,5 @@ ffmpeg
 faster-whisper
 ollama
 opencv-python
+fastapi
+uvicorn
