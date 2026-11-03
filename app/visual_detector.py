@@ -104,7 +104,22 @@ Return ONLY JSON:
             "visual_evidence": []
         }
 
-    result = json.loads(content)
+    try:
+        result = json.loads(content)
+
+    except json.JSONDecodeError as e:
+
+        print(f"WARNING: Invalid JSON response: {e}")
+
+        return {
+            "is_ad": False,
+            "ad_type": "other",
+            "brand": None,
+            "confidence": 0.0,
+            "description": "VLM returned malformed JSON.",
+            "visual_evidence": [],
+            "classification_error": "invalid_json"
+        }
 
     if result.get("ad_type") not in ALLOWED_AD_TYPES:
         result["ad_type"] = "other"
